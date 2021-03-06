@@ -11,3 +11,31 @@
     import 'relative/path/to/stylesheet.scss';
 
 */
+
+body{
+    background-color: #094771;
+}
+
+input{
+    font-size: 25px!important;
+    font-family: sans-serif;    
+}
+
+li{
+    font-size: 25px!important;
+    font-family: sans-serif;    
+}
+
+.panelFootFirst{
+    background: #e4e0e0;
+    width: 98%;
+    height: 10px;
+    margin: 0 auto;
+}
+
+.panelFootSecond{
+    background: #cccccc;
+    width: 96%;
+    height: 10px;
+    margin: 0 auto; 
+}
