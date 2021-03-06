@@ -56,7 +56,7 @@ export function Home() {
 		<>
 			<div className="container">
 				<div className="text-center mt-5">
-					<h1 className="display-2 alert alert-primary">To Dos</h1>
+					<h1 className="display-2 alert alert-primary">To Do's</h1>
 				</div>
 				<div className="card">
 					<div className="card-body">
