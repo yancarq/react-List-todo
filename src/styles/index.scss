@@ -39,3 +39,11 @@ li{
     height: 10px;
     margin: 0 auto; 
 }
+
+.list-group-item .close {
+    display: none;
+}
+
+.list-group-item:hover .close {
+    display: inline-block;
+}
