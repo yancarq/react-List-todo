@@ -3,8 +3,9 @@ import React, { useState, useEffect } from "react";
 //Todo List
 export function Home() {
 	const url = "https://assets.breatheco.de/apis/fake/todos/user/yancarq";
-
+	let estado = false;
 	const [listTodo, setListTodo] = useState([]);
+	const [valueInput, setValueInput] = useState("");
 
 	useEffect(() => {
 		CreateUserApi();
@@ -12,70 +13,56 @@ export function Home() {
 	}, []);
 
 	useEffect(() => {
-		CreateUserApi();
-		GetTodoList();
-
-		async function UpdateTodolist() {
-			console.log(listTodo);
-			console.log(listTodo.length + " -- ");
-			fetch(url, {
-				method: "PUT",
-				body: JSON.stringify(listTodo),
-				headers: {
-					"Content-Type": "application/json"
-				}
-			})
-				.then(resp => resp.json())
-				.then(data => {
-					GetTodoList();
-					console.log(data);
-				})
-				.catch(function(error) {
-					//manejo de errores
-					console.log("error", error.message);
-					console.log("Error");
-				});
-		}
-
 		UpdateTodolist();
-	});
+	}, [valueInput]);
 
-	function AddTodoList(evento) {
-		let valor = evento.target.value;
-		if (valor != "") {
-			let task = {
-				label: valor,
-				done: false
-			};
-			setListTodo(listTodo => listTodo.concat(task));
-			evento.target.value = "";
-			console.log(listTodo.length);
-		} else {
-			alert("Santo guacamole! Debe ingresar una tarea.!!!");
-		}
-	}
+	const AddTodoList = task => setListTodo(listTodo => listTodo.concat(task));
 
 	function EventEnter(evento) {
 		if (evento.key === "Enter" || evento.keyCode === 13) {
-			AddTodoList(evento);
-			console.log(listTodo.length + " -- ");
-			//UpdateTodolist();
+			let valor = valueInput;
+			if (valor != "") {
+				let task = {
+					label: valor,
+					done: false
+				};
+				estado = true;
+				setValueInput("");
+				AddTodoList(task);
+			} else {
+				alert("Santo guacamole! Debe ingresar una tarea.!!!");
+			}
 		}
 	}
 
 	function DeleteTodo(posicion) {
 		let lista = listTodo;
-		//	lista.splice(posicion, 1);
 		lista[posicion].done = true;
 		setListTodo(listTodo => lista.concat());
-		console.log(lista);
+
+		fetch(url, {
+			method: "PUT",
+			body: JSON.stringify(listTodo),
+			headers: {
+				"Content-Type": "application/json"
+			}
+		})
+			.then(resp => resp.json())
+			.then(data => {
+				GetTodoList();
+			})
+			.catch(function(error) {
+				//manejo de errores
+				console.log("error", error.message);
+				console.log("Error");
+			});
 	}
 
 	//Conectar a la API Fetch
-	function CreateUserApi() {
-		fetch(url, {
+	async function CreateUserApi() {
+		let result = await fetch(url, {
 			method: "POST",
-			body: [],
+			body: "[]",
 			headers: {
 				"Content-Type": "application/json"
 			}
@@ -92,8 +79,6 @@ export function Home() {
 	}
 
 	function UpdateTodolist() {
-		console.log(listTodo);
-
 		fetch(url, {
 			method: "PUT",
 			body: JSON.stringify(listTodo),
@@ -104,7 +89,6 @@ export function Home() {
 			.then(resp => resp.json())
 			.then(data => {
 				GetTodoList();
-				console.log(data);
 			})
 			.catch(function(error) {
 				//manejo de errores
@@ -113,8 +97,8 @@ export function Home() {
 			});
 	}
 
-	function GetTodoList() {
-		fetch(url, {
+	async function GetTodoList() {
+		let result = await fetch(url, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json"
@@ -122,9 +106,10 @@ export function Home() {
 		})
 			.then(resp => resp.json())
 			.then(data => {
-				let listaResultado = data.filter(elem => elem.done == false);
-				console.log(listaResultado);
-				setListTodo(listTodo => listaResultado);
+				let listaResultado = [];
+				setListTodo(listTodo =>
+					data.filter(elem => elem.done == false)
+				);
 			})
 			.catch(function(error) {
 				//manejo de errores
@@ -167,8 +152,9 @@ export function Home() {
 						<input
 							type="text"
 							className="form-control"
+							value={valueInput}
 							placeholder="Agregar tareas por hacer!!!"
-							// onBlur={e => AgregarTodoLista(e)}
+							onChange={e => setValueInput(e.target.value)}
 							onKeyUp={e => EventEnter(e)}
 						/>
 						<DrawTodoList />
