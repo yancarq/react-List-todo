@@ -37,8 +37,8 @@ export function Home() {
 
 	function DeleteTodo(posicion) {
 		let lista = listTodo;
-		lista[posicion].done = true;
-		setListTodo(lista.concat());
+		lista[posicion].done = true; //cambio el estado de la tarea a true para que al volver a cargar se filtre las que esten en false
+		setListTodo(lista.concat()); //realizando un eliminado logico 
 
 		fetch(url, {
 			method: "PUT",
