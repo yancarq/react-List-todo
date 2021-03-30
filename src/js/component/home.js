@@ -38,7 +38,7 @@ export function Home() {
 	function DeleteTodo(posicion) {
 		let lista = listTodo;
 		lista[posicion].done = true;
-		setListTodo(listTodo => lista.concat());
+		setListTodo(lista.concat());
 
 		fetch(url, {
 			method: "PUT",
@@ -48,9 +48,7 @@ export function Home() {
 			}
 		})
 			.then(resp => resp.json())
-			.then(data => {
-				GetTodoList();
-			})
+			.then(resultado => GetTodoList())
 			.catch(function(error) {
 				//manejo de errores
 				console.log("error", error.message);
@@ -79,22 +77,24 @@ export function Home() {
 	}
 
 	function UpdateTodolist() {
-		fetch(url, {
-			method: "PUT",
-			body: JSON.stringify(listTodo),
-			headers: {
-				"Content-Type": "application/json"
-			}
-		})
-			.then(resp => resp.json())
-			.then(data => {
-				GetTodoList();
+		if (listTodo.length > 0) {
+			fetch(url, {
+				method: "PUT",
+				body: JSON.stringify(listTodo),
+				headers: {
+					"Content-Type": "application/json"
+				}
 			})
-			.catch(function(error) {
-				//manejo de errores
-				console.log("error", error.message);
-				console.log("Error");
-			});
+				.then(resp => resp.json())
+				.then(data => GetTodoList())
+				.catch(function(error) {
+					//manejo de errores
+					console.log("error", error.message);
+					console.log("Error");
+				});
+		} else {
+			console.log("No hay datos");
+		}
 	}
 
 	async function GetTodoList() {
@@ -106,10 +106,8 @@ export function Home() {
 		})
 			.then(resp => resp.json())
 			.then(data => {
-				let listaResultado = [];
-				setListTodo(listTodo =>
-					data.filter(elem => elem.done == false)
-				);
+				let listaResultado = data.filter(todo => todo.done == false);
+				setListTodo(listaResultado);
 			})
 			.catch(function(error) {
 				//manejo de errores
