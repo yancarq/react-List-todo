@@ -1,126 +1,39 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 //Todo List
 export function Home() {
-	const url = "https://assets.breatheco.de/apis/fake/todos/user/yancarq";
-	let estado = false;
 	const [listTodo, setListTodo] = useState([]);
-	const [valueInput, setValueInput] = useState("");
-
-	useEffect(() => {
-		CreateUserApi();
-		GetTodoList();
-	}, []);
-
-	useEffect(() => {
-		UpdateTodolist();
-	}, [valueInput]);
-
-	const AddTodoList = task => setListTodo(listTodo => listTodo.concat(task));
 
 	function EventEnter(evento) {
 		if (evento.key === "Enter" || evento.keyCode === 13) {
-			let valor = valueInput;
-			if (valor != "") {
-				let task = {
-					label: valor,
-					done: false
-				};
-				estado = true;
-				setValueInput("");
-				AddTodoList(task);
-			} else {
-				alert("Santo guacamole! Debe ingresar una tarea.!!!");
-			}
+			AddTodoList(evento);
+		}
+	}
+	function AddTodoList(evento) {
+		let valor = evento.target.value;
+		if (valor != "") {
+			setListTodo(listTodo => listTodo.concat(valor));
+			evento.target.value = "";
+		} else {
+			alert("Santo guacamole! Debe ingresar una tarea.!!!");
 		}
 	}
 
 	function DeleteTodo(posicion) {
 		let lista = listTodo;
-		lista[posicion].done = true; //cambio el estado de la tarea a true para que al volver a cargar se filtre las que esten en false
-		setListTodo(lista.concat()); //realizando un eliminado logico 
+		console.log(lista);
 
-		fetch(url, {
-			method: "PUT",
-			body: JSON.stringify(listTodo),
-			headers: {
-				"Content-Type": "application/json"
-			}
-		})
-			.then(resp => resp.json())
-			.then(resultado => GetTodoList())
-			.catch(function(error) {
-				//manejo de errores
-				console.log("error", error.message);
-				console.log("Error");
-			});
-	}
+		lista.splice(posicion, 1);
+		console.log(lista);
 
-	//Conectar a la API Fetch
-	async function CreateUserApi() {
-		let result = await fetch(url, {
-			method: "POST",
-			body: "[]",
-			headers: {
-				"Content-Type": "application/json"
-			}
-		})
-			.then(resp => resp.json())
-			.then(data => {
-				console.log(data);
-			})
-			.catch(function(error) {
-				//manejo de errores
-				console.log("error", error.message);
-				console.log("Error");
-			});
-	}
-
-	function UpdateTodolist() {
-		if (listTodo.length > 0) {
-			fetch(url, {
-				method: "PUT",
-				body: JSON.stringify(listTodo),
-				headers: {
-					"Content-Type": "application/json"
-				}
-			})
-				.then(resp => resp.json())
-				.then(data => GetTodoList())
-				.catch(function(error) {
-					//manejo de errores
-					console.log("error", error.message);
-					console.log("Error");
-				});
-		} else {
-			console.log("No hay datos");
-		}
-	}
-
-	async function GetTodoList() {
-		let result = await fetch(url, {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json"
-			}
-		})
-			.then(resp => resp.json())
-			.then(data => {
-				let listaResultado = data.filter(todo => todo.done == false);
-				setListTodo(listaResultado);
-			})
-			.catch(function(error) {
-				//manejo de errores
-				console.log("error", error.message);
-				console.log("Error");
-			});
+		setListTodo(listTodo => lista.concat());
 	}
 
 	function DrawTodoList() {
 		const li = listTodo.map((value, index) => {
 			return (
 				<li className="list-group-item" key={index}>
-					{value.label}
+					{value}
 					<button
 						type="button"
 						className="close text-danger"
@@ -150,9 +63,8 @@ export function Home() {
 						<input
 							type="text"
 							className="form-control"
-							value={valueInput}
 							placeholder="Agregar tareas por hacer!!!"
-							onChange={e => setValueInput(e.target.value)}
+							// onBlur={e => AgregarTodoLista(e)}
 							onKeyUp={e => EventEnter(e)}
 						/>
 						<DrawTodoList />
@@ -167,51 +79,3 @@ export function Home() {
 		</>
 	);
 }
-
-// function CreateTodoList() {
-// 	fetch(url, {
-// 		method: "POST",
-// 		body: [],
-// 		headers: {
-// 			"Content-Type": "application/json"
-// 		}
-// 	})
-// 		.then(resp => {
-// 			console.log(resp.ok); // Será true (verdad) si la respuesta es exitosa.
-// 			console.log(resp.status); // el código de estado = 200 o código = 400 etc.
-// 			console.log(resp.text()); // Intentará devolver el resultado exacto como cadena (string)
-// 			return resp.json(); // (regresa una promesa) will try to parse the result as json as return a promise that you can .then for results
-// 		})
-// 		.then(data => {
-// 			//Aquí es donde debe comenzar tu código después de que finalice la búsqueda
-// 			console.log(data); //esto imprimirá en la consola el objeto exacto recibido del servidor
-// 		})
-// 		.catch(error => {
-// 			//manejo de errores
-// 			console.log(error);
-// 		});
-// }
-
-function DeleteTodoList() {}
-
-// fetch(url, {
-// 	method: "POST",
-// 	body: JSON.stringify(todos),
-// 	headers: {
-// 		"Content-Type": "application/json"
-// 	}
-// })
-// 	.then(resp => {
-// 		console.log(resp.ok); // Será true (verdad) si la respuesta es exitosa.
-// 		console.log(resp.status); // el código de estado = 200 o código = 400 etc.
-// 		console.log(resp.text()); // Intentará devolver el resultado exacto como cadena (string)
-// 		return resp.json(); // (regresa una promesa) will try to parse the result as json as return a promise that you can .then for results
-// 	})
-// 	.then(data => {
-// 		//Aquí es donde debe comenzar tu código después de que finalice la búsqueda
-// 		console.log(data); //esto imprimirá en la consola el objeto exacto recibido del servidor
-// 	})
-// 	.catch(error => {
-// 		//manejo de errores
-// 		console.log(error);
-// 	});
